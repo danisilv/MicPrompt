@@ -13,6 +13,21 @@ import sounddevice as sd
 import soundfile as sf
 import keyboard
 import pyperclip
+import winsound
+
+# Simple beep signals for start/stop recording
+def beep_start():
+    try:
+        winsound.Beep(1200, 120)
+    except Exception:
+        pass
+
+
+def beep_stop():
+    try:
+        winsound.Beep(800, 120)
+    except Exception:
+        pass
 
 from PIL import Image
 import pystray
@@ -36,6 +51,8 @@ PRIMARY_STT_MODEL = "gpt-4o-transcribe"
 FALLBACK_STT_MODEL = "whisper-1"
 # Modelo atual (inicia como GPT-4o Transcribe)
 CURRENT_STT_MODEL = PRIMARY_STT_MODEL
+# Desabilita toasts; usaremos bipes para feedback de início/fim
+NOTIFY_ENABLED = False
 
 ADD_TRAILING_SPACE = True
 ADD_TRAILING_NEWLINE = False
@@ -66,6 +83,8 @@ def ensure_single_instance():
 # ============== NOTIFICAÇÃO SEM ACÚMULO ==============
 def notify(title, msg):
     global last_toast
+    if not NOTIFY_ENABLED:
+        return
     try:
         if last_toast and last_toast.is_alive():
             last_toast.stop()  # ✅ fecha notificação anterior
@@ -123,6 +142,7 @@ def start_recording():
 
         stream.start()
         is_recording = True
+        beep_start()
         notify("🎙️ Gravando...", "Pressione novamente para parar.")
 
 
@@ -139,6 +159,8 @@ def stop_recording(save=True):
             pass
 
         is_recording = False
+    # Beep feedback when stopping
+    beep_stop()
 
     if not save:
         while not audio_q.empty():
