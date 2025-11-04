@@ -1,0 +1,8 @@
+keyboard
+pyaudio
+sounddevice
+openai
+pystray
+Pillow
+win10toast-click==0.1.2
+pywin32
